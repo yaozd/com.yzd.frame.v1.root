@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <parent>
+        <artifactId>com.yzd.frame.v1.root</artifactId>
+        <groupId>com.yzd.frame.v1.root</groupId>
+        <version>1.0-SNAPSHOT</version>
+        <relativePath>../pom.xml</relativePath>
+    </parent>
+    <modelVersion>4.0.0</modelVersion>
+
+    <artifactId>com.yzd.db.temp.entity</artifactId>
+    <properties>
+        <!--当前是一个接口定义的包为解决MAVEN打包成可运行的jar-没办法找到唯一的一个入口类问题-->
+        <!--设置了一个不存在的虚拟入口类-->
+        <start-class>com.yzd.db.temp.entity.ApplicationMainClass</start-class>
+    </properties>
+
+</project>
