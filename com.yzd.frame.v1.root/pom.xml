@@ -17,6 +17,7 @@
         <module>2.1-com.yzd.db.temp.entity</module>
         <module>2.1-com.yzd.db.temp.dao</module>
         <module>1.1-com.yzd.session</module>
+        <module>3.1-com.yzd.frame.common.mq</module>
     </modules>
     <parent>
         <groupId>org.springframework.boot</groupId>
