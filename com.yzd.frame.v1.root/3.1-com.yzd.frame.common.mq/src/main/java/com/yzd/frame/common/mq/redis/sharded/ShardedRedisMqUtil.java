@@ -8,6 +8,7 @@ import redis.clients.util.Hashing;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 
 /**
  * Created by Administrator on 2017/3/6.
@@ -366,4 +367,209 @@ public class ShardedRedisMqUtil {
         });
     }
     /**************************** redis 列表List end***************************/
+
+    /**************************** redis 集合Set start***************************/
+    /**Redis的Set是string类型的无序集合。集合成员是唯一的，这就意味着集合中不能出现重复的数据。**/
+    /**
+     * 向集合添加一个或多个成员，返回添加成功的数量
+     * @param key
+     * @param members
+     * @return Long
+     */
+    public  Long sadd(String key, String... members){
+        return execute(key, new ShardedRedisExecutor<Long>() {
+            @Override
+            public Long execute(ShardedJedis jedis) {
+                Long values = jedis.sadd(key, members);
+                return values;
+            }
+        });
+    }
+    /**
+     * 获取集合的成员数
+     * @param key
+     * @return
+     */
+    public Long scard(String key){
+        return execute(key, new ShardedRedisExecutor<Long>() {
+            @Override
+            public Long execute(ShardedJedis jedis) {
+                Long values = jedis.scard(key);
+                return values;
+            }
+        });
+    }
+    /**
+     * 返回集合中的所有成员
+     * @param key
+     * @return Set<String>
+     */
+    public  Set<String> smembers(String key){
+        return execute(key, new ShardedRedisExecutor<Set<String>>() {
+            @Override
+            public Set<String> execute(ShardedJedis jedis) {
+                Set<String> values =  jedis.smembers(key);
+                return values;
+            }
+        });
+    }
+    /**
+     * 判断 member 元素是否是集合 key 的成员，在集合中返回True
+     * @param key
+     * @param member
+     * @return Boolean
+     */
+    public  Boolean sIsMember(String key, String member){
+        return execute(key, new ShardedRedisExecutor<Boolean>() {
+            @Override
+            public Boolean execute(ShardedJedis jedis) {
+                Boolean value = jedis.sismember(key, member);
+                return value;
+            }
+        });
+    }
+    /**
+     * 移除集合中一个或多个成员
+     * @param key
+     * @param members
+     * @return
+     */
+    public  boolean srem(String key, String... members){
+        //Integer reply, specifically: 1 if the new element was removed
+        //0 if the new element was not a member of the set
+        return execute(key, new ShardedRedisExecutor<Boolean>() {
+            @Override
+            public Boolean execute(ShardedJedis jedis) {
+                Long value = jedis.srem(key, members);
+                if(value > 0){
+                    return true;
+                }
+                return false;
+            }
+        });
+    }
+    /**
+     * 返回集合中一个或多个随机数
+     * <li>当count大于set的长度时，set所有值返回，不会抛错。</li>
+     * <li>当count等于0时，返回[]</li>
+     * <li>当count小于0时，也能返回。如-1返回一个，-2返回两个</li>
+     * @param key
+     * @param count
+     * @return List<String>
+     */
+    public  List<String> srandMember(String key, int count){
+        return execute(key, new ShardedRedisExecutor<List<String>>() {
+            @Override
+            public List<String> execute(ShardedJedis jedis) {
+                List<String> values = jedis.srandmember(key, count);
+                return values;
+            }
+        });
+    }
+    /**
+     * 移除并返回集合中的一个随机元素
+     * <li>当set为空或者不存在时，返回Null</li>
+     * @param key
+     * @return String
+     */
+    public  String spop(String key){
+        return execute(key, new ShardedRedisExecutor<String>() {
+            @Override
+            public String execute(ShardedJedis jedis) {
+                String value = jedis.spop(key);
+                return value;
+            }
+        });
+    }
+    /**************************** redis 集合Set end***************************/
+
+    /**************************** redis String start***************************/
+    /**Redis操作字符串工具类封装**/
+    public String set(final String key, final String value) {
+        return execute(key, new ShardedRedisExecutor<String>() {
+            @Override
+            public String execute(ShardedJedis jedis) {
+                return jedis.set(key, value);
+            }
+        });
+    }
+
+    public String set(final String key, final String value, final String nxxx, final String expx, final long time) {
+        return execute(key, new ShardedRedisExecutor<String>() {
+            @Override
+            public String execute(ShardedJedis jedis) {
+                return jedis.set(key, value, nxxx, expx, time);
+            }
+        });
+    }
+
+    public String get(final String key) {
+        return execute(key, new ShardedRedisExecutor<String>() {
+            @Override
+            public String execute(ShardedJedis jedis) {
+                return jedis.get(key);
+            }
+        });
+    }
+
+    public Boolean exists(final String key) {
+        return execute(key, new ShardedRedisExecutor<Boolean>() {
+            @Override
+            public Boolean execute(ShardedJedis jedis) {
+                return jedis.exists(key);
+            }
+        });
+    }
+
+    public Long setnx(final String key, final String value) {
+        return execute(key, new ShardedRedisExecutor<Long>() {
+            @Override
+            public Long execute(ShardedJedis jedis) {
+                return jedis.setnx(key, value);
+            }
+        });
+    }
+    public String setex(final String key, final int seconds, final String value) {
+        return execute(key, new ShardedRedisExecutor<String>() {
+            @Override
+            public String execute(ShardedJedis jedis) {
+                return jedis.setex(key, seconds, value);
+            }
+        });
+    }
+
+    public Long expire(final String key, final int seconds) {
+        return execute(key, new ShardedRedisExecutor<Long>() {
+            @Override
+            public Long execute(ShardedJedis jedis) {
+                return jedis.expire(key, seconds);
+            }
+        });
+    }
+    public Long incr(final String key) {
+        return execute(key, new ShardedRedisExecutor<Long>() {
+            @Override
+            public Long execute(ShardedJedis jedis) {
+                return jedis.incr(key);
+            }
+        });
+    }
+
+    public Long decr(final String key) {
+        return execute(key, new ShardedRedisExecutor<Long>() {
+            @Override
+            public Long execute(ShardedJedis jedis) {
+                return jedis.decr(key);
+            }
+        });
+    }
+    public Long del(final String key) {
+        return execute(key, new ShardedRedisExecutor<Long>() {
+            @Override
+            public Long execute(ShardedJedis jedis) {
+                return jedis.del(key);
+            }
+        });
+    }
+    /**************************** redis String end***************************/
 }
