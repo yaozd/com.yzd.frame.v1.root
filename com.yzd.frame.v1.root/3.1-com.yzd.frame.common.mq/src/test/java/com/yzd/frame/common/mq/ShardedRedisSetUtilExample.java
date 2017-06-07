@@ -71,7 +71,8 @@ public class ShardedRedisSetUtilExample {
             long countOfsadd = redisUtil.sadd(orderMQ_set01, uuid);
             //todo 判断当前消息是否存在-如果当前消息不存在，则插入到list消息队列中
             if (countOfsadd == 1) {
-                long countOflpush = redisUtil.lpush(orderMQ_list01, uuid);
+                //todo 常规操作-从尾部插入
+                long countOflpush = redisUtil.rpush(orderMQ_list01, uuid);
                 System.out.println(String.format("countOfsadd:%s,countOflpush:%s", countOfsadd, countOflpush));
             }
         }
@@ -89,6 +90,7 @@ public class ShardedRedisSetUtilExample {
         for (int i = 0; i < 10000; i++) {
             ////todo Redis消息队列网络异常
             //当超期时间到达时，keys列表仍然没有内容，则返回Null
+            //todo 常规操作-从头部读取
             String taskId = redisUtil.blpop(5, orderMQ_list01);
             System.out.println(taskId);
             if (taskId == null) {
@@ -128,8 +130,10 @@ public class ShardedRedisSetUtilExample {
         //
         for (String e : setList) {
             //todo 判断当前消息队列中是否存在此消息
-            long valOfLrem = redisUtil.lrem(orderMQ_list01, 1, e);
+            //todo 当count为负数时，移除方向是从尾到头-删除
+            long valOfLrem = redisUtil.lrem(orderMQ_list01, -1, e);
             if (valOfLrem == 1) {
+                //todo 常规操作-从头部插入
                 redisUtil.lpush(orderMQ_list01, e);
                 continue;
             }
