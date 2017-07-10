@@ -1,5 +1,6 @@
 package com.yzd.frame.common.mq.redis.sharded;
 
+import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.math.NumberUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -7,6 +8,7 @@ import redis.clients.jedis.*;
 import redis.clients.util.Hashing;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 import java.util.Set;
 
@@ -72,6 +74,7 @@ public class ShardedRedisMqUtil {
     public static ShardedRedisMqUtil getInstance() {
         return INSTANCE;
     }
+
     /**
      * 实现jedis连接的获取和释放，具体的redis业务逻辑由executor实现
      *
@@ -91,14 +94,39 @@ public class ShardedRedisMqUtil {
         return result;
     }
 
+    /**
+     *  这是一种特殊情况-以Redis作为消息队列-并且队列内容特别的大
+     *  这里会以List中的value的值做为分片的信息
+     *  这样就可以实现水平扩展
+     *  主要解决redis作为消息队列时出现数据倾斜的问题
+     * @param jedisPool
+     * @param key
+     * @param executor
+     * @param <T>
+     * @return
+     */
+    public <T> T execute(ShardedJedisPool jedisPool,String key, ShardedJedisPoolExecutor<T> executor) {
+        ShardedJedis jedis = jedisPool.getResource();
+        T result = null;
+        try {
+            result = executor.execute(jedis);
+        } finally {
+            if (jedis != null) {
+                jedis.close();
+            }
+        }
+        return result;
+    }
+
     /**************************** redis 列表List start***************************/
     /**
      * 将一个值插入到列表头部，value可以重复，返回列表的长度
+     *
      * @param key
      * @param value String
      * @return 返回List的长度
      */
-    public Long lpush(final String key, final String value){
+    public Long lpush(final String key, final String value) {
         return execute(key, new ShardedRedisExecutor<Long>() {
             @Override
             public Long execute(ShardedJedis jedis) {
@@ -107,13 +135,15 @@ public class ShardedRedisMqUtil {
             }
         });
     }
+
     /**
      * 将多个值插入到列表头部，value可以重复
+     *
      * @param key
      * @param values String[]
      * @return 返回List的数量size
      */
-    public  Long lpush(String key, String[] values){
+    public Long lpush(String key, String[] values) {
         return execute(key, new ShardedRedisExecutor<Long>() {
             @Override
             public Long execute(ShardedJedis jedis) {
@@ -122,14 +152,16 @@ public class ShardedRedisMqUtil {
             }
         });
     }
+
     /**
      * 获取List列表
+     *
      * @param key
      * @param start long，开始索引
-     * @param end long， 结束索引
+     * @param end   long， 结束索引
      * @return List<String>
      */
-    public  List<String> lrange(String key, long start, long end){
+    public List<String> lrange(String key, long start, long end) {
         return execute(key, new ShardedRedisExecutor<List<String>>() {
             @Override
             public List<String> execute(ShardedJedis jedis) {
@@ -138,13 +170,15 @@ public class ShardedRedisMqUtil {
             }
         });
     }
+
     /**
      * 通过索引获取列表中的元素
+     *
      * @param key
      * @param index，索引，0表示最新的一个元素
      * @return String
      */
-    public  String lindex(String key, long index){
+    public String lindex(String key, long index) {
         return execute(key, new ShardedRedisExecutor<String>() {
             @Override
             public String execute(ShardedJedis jedis) {
@@ -153,12 +187,14 @@ public class ShardedRedisMqUtil {
             }
         });
     }
+
     /**
      * 获取列表长度，key为空时返回0
+     *
      * @param key
      * @return Long
      */
-    public  Long llen(String key){
+    public Long llen(String key) {
         return execute(key, new ShardedRedisExecutor<Long>() {
             @Override
             public Long execute(ShardedJedis jedis) {
@@ -167,15 +203,17 @@ public class ShardedRedisMqUtil {
             }
         });
     }
+
     /**
      * 在列表的元素前或者后插入元素，返回List的长度
+     *
      * @param key
      * @param where LIST_POSITION
      * @param pivot 以该元素作为参照物，是在它之前，还是之后（pivot：枢轴;中心点，中枢;[物]支点，支枢;[体]回转运动。）
      * @param value
      * @return Long
      */
-    public Long linsert(String key, BinaryClient.LIST_POSITION where, String pivot, String value){
+    public Long linsert(String key, BinaryClient.LIST_POSITION where, String pivot, String value) {
         return execute(key, new ShardedRedisExecutor<Long>() {
             @Override
             public Long execute(ShardedJedis jedis) {
@@ -184,13 +222,15 @@ public class ShardedRedisMqUtil {
             }
         });
     }
+
     /**
      * 将一个或多个值插入到已存在的列表头部，当成功时，返回List的长度；当不成功（即key不存在时，返回0）
+     *
      * @param key
      * @param value String
      * @return Long
      */
-    public  Long lpushx(String key, String value){
+    public Long lpushx(String key, String value) {
         return execute(key, new ShardedRedisExecutor<Long>() {
             @Override
             public Long execute(ShardedJedis jedis) {
@@ -199,17 +239,18 @@ public class ShardedRedisMqUtil {
             }
         });
     }
+
     /**
      * 移除列表元素，返回移除的元素数量
+     *
      * @param key
-     * @param count，标识，表示动作或者查找方向
-     * <li>当count=0时，移除所有匹配的元素；</li>
-     * <li>当count为负数时，移除方向是从尾到头；</li>
-     * <li>当count为正数时，移除方向是从头到尾；</li>
-     * @param value 匹配的元素
+     * @param count，标识，表示动作或者查找方向 <li>当count=0时，移除所有匹配的元素；</li>
+     *                            <li>当count为负数时，移除方向是从尾到头；</li>
+     *                            <li>当count为正数时，移除方向是从头到尾；</li>
+     * @param value               匹配的元素
      * @return Long
      */
-    public  Long lrem(String key, long count, String value){
+    public Long lrem(String key, long count, String value) {
         return execute(key, new ShardedRedisExecutor<Long>() {
             @Override
             public Long execute(ShardedJedis jedis) {
@@ -218,48 +259,52 @@ public class ShardedRedisMqUtil {
             }
         });
     }
+
     /**
      * 通过索引设置列表元素的值，当超出索引时会抛错。成功设置返回true
+     *
      * @param key
      * @param index 索引
      * @param value
      * @return boolean
      */
-    public  boolean lset(String key, long index, String value){
+    public boolean lset(String key, long index, String value) {
         return execute(key, jedis -> {
             String statusCode = jedis.lset(key, index, value);
-            if("ok".equalsIgnoreCase(statusCode)){
+            if ("ok".equalsIgnoreCase(statusCode)) {
                 return true;
             }
             return false;
         });
     }
+
     /**
      * 对一个列表进行修剪(trim)，就是说，让列表只保留指定区间内的元素，不在指定区间之内的元素都将被删除。
+     *
      * @param key
-     * @param start
-     * <li>可以为负数（-1是列表的最后一个元素，-2是列表倒数第二的元素。）</li>
-     * <li>如果start大于end，则返回一个空的列表，即列表被清空</li>
-     * @param end
-     * <li>可以为负数（-1是列表的最后一个元素，-2是列表倒数第二的元素。）</li>
-     * <li>可以超出索引，不影响结果</li>
+     * @param start <li>可以为负数（-1是列表的最后一个元素，-2是列表倒数第二的元素。）</li>
+     *              <li>如果start大于end，则返回一个空的列表，即列表被清空</li>
+     * @param end   <li>可以为负数（-1是列表的最后一个元素，-2是列表倒数第二的元素。）</li>
+     *              <li>可以超出索引，不影响结果</li>
      * @return boolean
      */
-    public  boolean ltrim(String key, long start, long end){
+    public boolean ltrim(String key, long start, long end) {
         return execute(key, jedis -> {
             String statusCode = jedis.ltrim(key, start, end);
-            if("ok".equalsIgnoreCase(statusCode)){
+            if ("ok".equalsIgnoreCase(statusCode)) {
                 return true;
             }
             return false;
         });
     }
+
     /**
      * 移出并获取列表的第一个元素，当列表不存在或者为空时，返回Null
+     *
      * @param key
      * @return String
      */
-    public  String lpop(String key){
+    public String lpop(String key) {
         return execute(key, new ShardedRedisExecutor<String>() {
             @Override
             public String execute(ShardedJedis jedis) {
@@ -268,12 +313,14 @@ public class ShardedRedisMqUtil {
             }
         });
     }
+
     /**
      * 移除并获取列表最后一个元素，当列表不存在或者为空时，返回Null
+     *
      * @param key
      * @return String
      */
-    public  String rpop(String key){
+    public String rpop(String key) {
         return execute(key, new ShardedRedisExecutor<String>() {
             @Override
             public String execute(ShardedJedis jedis) {
@@ -282,13 +329,15 @@ public class ShardedRedisMqUtil {
             }
         });
     }
+
     /**
      * 在列表中的尾部添加一个个值，返回列表的长度
+     *
      * @param key
      * @param value
      * @return Long
      */
-    public  Long rpush(String key, String value){
+    public Long rpush(String key, String value) {
         return execute(key, new ShardedRedisExecutor<Long>() {
             @Override
             public Long execute(ShardedJedis jedis) {
@@ -297,13 +346,15 @@ public class ShardedRedisMqUtil {
             }
         });
     }
+
     /**
      * 在列表中的尾部添加多个值，返回列表的长度
+     *
      * @param key
      * @param values
      * @return Long
      */
-    public  Long rpush(String key, String[] values){
+    public Long rpush(String key, String[] values) {
         return execute(key, new ShardedRedisExecutor<Long>() {
             @Override
             public Long execute(ShardedJedis jedis) {
@@ -315,11 +366,12 @@ public class ShardedRedisMqUtil {
 
     /**
      * 仅当列表存在时，才会向列表中的尾部添加一个值，返回列表的长度
+     *
      * @param key
      * @param value
      * @return Long
      */
-    public  Long rpushx(String key, String value){
+    public Long rpushx(String key, String value) {
         return execute(key, new ShardedRedisExecutor<Long>() {
             @Override
             public Long execute(ShardedJedis jedis) {
@@ -328,55 +380,57 @@ public class ShardedRedisMqUtil {
             }
         });
     }
+
     /**
      * 移出并获取列表的【第一个元素】， 如果列表没有元素会阻塞列表直到等待超时或发现可弹出元素为止。
+     *
      * @param timeout 单位为秒
-     * @param key
-     * <li>当有多个key时，只要某个key值的列表有内容，即马上返回，不再阻塞。</li>
-     * <li>当所有key都没有内容或不存在时，则会阻塞，直到有值返回或者超时。</li>
-     * <li>当超期时间到达时，keys列表仍然没有内容，则返回Null</li>
+     * @param key     <li>当有多个key时，只要某个key值的列表有内容，即马上返回，不再阻塞。</li>
+     *                <li>当所有key都没有内容或不存在时，则会阻塞，直到有值返回或者超时。</li>
+     *                <li>当超期时间到达时，keys列表仍然没有内容，则返回Null</li>
      * @return List<String>
      */
-    public  String blpop(int timeout, String key){
+    public String blpop(int timeout, String key) {
         return execute(key, new ShardedRedisExecutor<String>() {
             @Override
             public String execute(ShardedJedis jedis) {
                 List<String> value = jedis.blpop(timeout, key);
-                if(value==null||value.isEmpty()||value.size()<2)return null;
+                if (value == null || value.isEmpty() || value.size() < 2) return null;
                 return value.get(1);
             }
         });
     }
+
     /**
      * 移出并获取列表的【最后一个元素】， 如果列表没有元素会阻塞列表直到等待超时或发现可弹出元素为止。
+     *
      * @param timeout 单位为秒
-     * @param key
-     * <li>当有多个key时，只要某个key值的列表有内容，即马上返回，不再阻塞。</li>
-     * <li>当所有key都没有内容或不存在时，则会阻塞，直到有值返回或者超时。</li>
-     * <li>当超期时间到达时，keys列表仍然没有内容，则返回Null</li>
+     * @param key     <li>当有多个key时，只要某个key值的列表有内容，即马上返回，不再阻塞。</li>
+     *                <li>当所有key都没有内容或不存在时，则会阻塞，直到有值返回或者超时。</li>
+     *                <li>当超期时间到达时，keys列表仍然没有内容，则返回Null</li>
      * @return List<String>
      */
-    public  String brpop(int timeout, String key){
+    public String brpop(int timeout, String key) {
         return execute(key, new ShardedRedisExecutor<String>() {
             @Override
             public String execute(ShardedJedis jedis) {
                 List<String> value = jedis.brpop(timeout, key);
-                if(value==null||value.isEmpty()||value.size()<2)return null;
+                if (value == null || value.isEmpty() || value.size() < 2) return null;
                 return value.get(1);
             }
         });
     }
     /**************************** redis 列表List end***************************/
-
     /**************************** redis 集合Set start***************************/
     /**Redis的Set是string类型的无序集合。集合成员是唯一的，这就意味着集合中不能出现重复的数据。**/
     /**
      * 向集合添加一个或多个成员，返回添加成功的数量
+     *
      * @param key
      * @param members
      * @return Long
      */
-    public  Long sadd(String key, String... members){
+    public Long sadd(String key, String... members) {
         return execute(key, new ShardedRedisExecutor<Long>() {
             @Override
             public Long execute(ShardedJedis jedis) {
@@ -385,12 +439,14 @@ public class ShardedRedisMqUtil {
             }
         });
     }
+
     /**
      * 获取集合的成员数
+     *
      * @param key
      * @return
      */
-    public Long scard(String key){
+    public Long scard(String key) {
         return execute(key, new ShardedRedisExecutor<Long>() {
             @Override
             public Long execute(ShardedJedis jedis) {
@@ -399,27 +455,31 @@ public class ShardedRedisMqUtil {
             }
         });
     }
+
     /**
      * 返回集合中的所有成员
+     *
      * @param key
      * @return Set<String>
      */
-    public  Set<String> smembers(String key){
+    public Set<String> smembers(String key) {
         return execute(key, new ShardedRedisExecutor<Set<String>>() {
             @Override
             public Set<String> execute(ShardedJedis jedis) {
-                Set<String> values =  jedis.smembers(key);
+                Set<String> values = jedis.smembers(key);
                 return values;
             }
         });
     }
+
     /**
      * 判断 member 元素是否是集合 key 的成员，在集合中返回True
+     *
      * @param key
      * @param member
      * @return Boolean
      */
-    public  Boolean sIsMember(String key, String member){
+    public Boolean sIsMember(String key, String member) {
         return execute(key, new ShardedRedisExecutor<Boolean>() {
             @Override
             public Boolean execute(ShardedJedis jedis) {
@@ -428,36 +488,40 @@ public class ShardedRedisMqUtil {
             }
         });
     }
+
     /**
      * 移除集合中一个或多个成员
+     *
      * @param key
      * @param members
      * @return
      */
-    public  boolean srem(String key, String... members){
+    public boolean srem(String key, String... members) {
         //Integer reply, specifically: 1 if the new element was removed
         //0 if the new element was not a member of the set
         return execute(key, new ShardedRedisExecutor<Boolean>() {
             @Override
             public Boolean execute(ShardedJedis jedis) {
                 Long value = jedis.srem(key, members);
-                if(value > 0){
+                if (value > 0) {
                     return true;
                 }
                 return false;
             }
         });
     }
+
     /**
      * 返回集合中一个或多个随机数
      * <li>当count大于set的长度时，set所有值返回，不会抛错。</li>
      * <li>当count等于0时，返回[]</li>
      * <li>当count小于0时，也能返回。如-1返回一个，-2返回两个</li>
+     *
      * @param key
      * @param count
      * @return List<String>
      */
-    public  List<String> srandMember(String key, int count){
+    public List<String> srandMember(String key, int count) {
         return execute(key, new ShardedRedisExecutor<List<String>>() {
             @Override
             public List<String> execute(ShardedJedis jedis) {
@@ -466,13 +530,15 @@ public class ShardedRedisMqUtil {
             }
         });
     }
+
     /**
      * 移除并返回集合中的一个随机元素
      * <li>当set为空或者不存在时，返回Null</li>
+     *
      * @param key
      * @return String
      */
-    public  String spop(String key){
+    public String spop(String key) {
         return execute(key, new ShardedRedisExecutor<String>() {
             @Override
             public String execute(ShardedJedis jedis) {
@@ -484,7 +550,9 @@ public class ShardedRedisMqUtil {
     /**************************** redis 集合Set end***************************/
 
     /**************************** redis String start***************************/
-    /**Redis操作字符串工具类封装**/
+    /**
+     * Redis操作字符串工具类封装*
+     */
     public String set(final String key, final String value) {
         return execute(key, new ShardedRedisExecutor<String>() {
             @Override
@@ -529,6 +597,7 @@ public class ShardedRedisMqUtil {
             }
         });
     }
+
     public String setex(final String key, final int seconds, final String value) {
         return execute(key, new ShardedRedisExecutor<String>() {
             @Override
@@ -546,6 +615,7 @@ public class ShardedRedisMqUtil {
             }
         });
     }
+
     public Long incr(final String key) {
         return execute(key, new ShardedRedisExecutor<Long>() {
             @Override
@@ -563,6 +633,7 @@ public class ShardedRedisMqUtil {
             }
         });
     }
+
     public Long del(final String key) {
         return execute(key, new ShardedRedisExecutor<Long>() {
             @Override
@@ -572,4 +643,70 @@ public class ShardedRedisMqUtil {
         });
     }
     /**************************** redis String end***************************/
+    /**************************** redis 列表List扩展 start***************************/
+    /**
+     *  这是一种特殊情况-以Redis作为消息队列-并且队列内容特别的大
+     *  这里会以List中的value的值做为分片的信息
+     *  这样就可以实现水平扩展
+     *  主要解决redis作为消息队列时出现数据倾斜的问题
+     */
+    /**
+     * 将一个值插入到列表头部，value可以重复，返回列表的长度
+     *
+     * @param key
+     * @param value String
+     * @return 返回List的长度
+     */
+    public Long lpushExt(final String key, final String value) {
+        return execute(key, new ShardedRedisExecutor<Long>() {
+            @Override
+            public Long execute(ShardedJedis shardedJedis) {
+                if (StringUtils.isBlank(value)) {
+                    throw new IllegalStateException("[lpushExt]的value参数不能为空");
+                }
+                String valueKey = value.trim();
+                Jedis j = (Jedis) shardedJedis.getShard(valueKey);
+                Long length = j.lpush(key, value);
+                return length;
+            }
+        });
+    }
+
+    /**
+     * 获得所有的Jedis的实例
+     */
+    public Collection<Jedis> getAllShards() {
+        return execute("", new ShardedRedisExecutor<Collection<Jedis>>() {
+            @Override
+            public Collection<Jedis> execute(ShardedJedis shardedJedis) {
+                return shardedJedis.getAllShards();
+            }
+        });
+    }
+    public Collection<JedisShardInfo> getAllShardInfo() {
+        return execute("", new ShardedRedisExecutor<Collection<JedisShardInfo>>() {
+            @Override
+            public Collection<JedisShardInfo> execute(ShardedJedis shardedJedis) {
+                return shardedJedis.getAllShardInfo();
+            }
+        });
+    }
+    /**
+     * 移出并获取列表的【最后一个元素】
+     * @param j
+     * @param key
+     * @param timeout 超时时间单位是秒
+     * @return
+     */
+    public String brpopExt(ShardedJedisPool j, String key,int timeout){
+        return execute(j, key, new ShardedJedisPoolExecutor<String>() {
+            @Override
+            public String execute(ShardedJedis jedis) {
+                List<String> value = jedis.brpop(timeout, key);
+                if (value == null || value.isEmpty() || value.size() < 2) return null;
+                return value.get(1);
+            }
+        });
+    }
+    /**************************** redis 列表List扩展 end***************************/
 }
