@@ -7,10 +7,7 @@ import org.slf4j.LoggerFactory;
 import redis.clients.jedis.*;
 import redis.clients.util.Hashing;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 /**
  * Created by Administrator on 2017/3/6.
@@ -23,6 +20,7 @@ public class ShardedRedisMqUtil {
     private static final String HOST_PORT_SEPARATOR = ":";
     private static final String WEIGHT_SEPARATOR = "\\*";
     private ShardedJedisPool shardedJedisPool = null;
+    private List<JedisShardInfo> jedisShardInfoList=null;
 
     private static final ShardedRedisMqUtil INSTANCE = new ShardedRedisMqUtil();
 
@@ -66,6 +64,8 @@ public class ShardedRedisMqUtil {
             Jedisinfo.setSoTimeout(timeout);
             shardedPoolList.add(Jedisinfo);
         }
+        //
+        jedisShardInfoList=shardedPoolList;
 
         // 构造池
         this.shardedJedisPool = new ShardedJedisPool(poolConfig, shardedPoolList, Hashing.MURMUR_HASH);
@@ -73,6 +73,10 @@ public class ShardedRedisMqUtil {
 
     public static ShardedRedisMqUtil getInstance() {
         return INSTANCE;
+    }
+    //获得所有的redis数据库信息
+    public List<JedisShardInfo> getAllJedisShardInfo(){
+        return jedisShardInfoList;
     }
 
     /**
@@ -674,6 +678,7 @@ public class ShardedRedisMqUtil {
 
     /**
      * 获得所有的Jedis的实例
+     * 暂时无用
      */
     public Collection<Jedis> getAllShards() {
         return execute("", new ShardedRedisExecutor<Collection<Jedis>>() {
@@ -683,6 +688,11 @@ public class ShardedRedisMqUtil {
             }
         });
     }
+    /**
+     * 获得所有redis分片信息（一致hash中生成的所有虚拟redis数据库）
+     * 暂时无用
+     * @return
+     */
     public Collection<JedisShardInfo> getAllShardInfo() {
         return execute("", new ShardedRedisExecutor<Collection<JedisShardInfo>>() {
             @Override
@@ -707,6 +717,24 @@ public class ShardedRedisMqUtil {
                 return value.get(1);
             }
         });
+    }
+
+    /**
+     * 通过JedisShardInfo分片信息生成一个连接数为1的ShardedJedisPool线程池
+     * 主要用redis的消息队列做分片时的数据读取中
+     * @param j
+     * @return
+     */
+    public ShardedJedisPool getOneShardedJedisPool(JedisShardInfo j){
+        // 设置jedis连接池配置
+        JedisPoolConfig poolConfig = new JedisPoolConfig();
+        poolConfig.setMaxTotal(1);
+        poolConfig.setMaxIdle(1);
+        poolConfig.setMinIdle(1);
+        poolConfig.setMaxWaitMillis(60000);
+        poolConfig.setTestOnBorrow(true);
+        ShardedJedisPool shardedJedisPool = new ShardedJedisPool(poolConfig, Arrays.asList(j), Hashing.MURMUR_HASH);
+        return shardedJedisPool;
     }
     /**************************** redis 列表List扩展 end***************************/
 }

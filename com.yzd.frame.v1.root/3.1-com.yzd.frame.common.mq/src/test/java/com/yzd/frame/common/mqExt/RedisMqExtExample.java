@@ -44,7 +44,7 @@ public class RedisMqExtExample {
     @Test
     public void getgetAllShardInfoExample() throws InterruptedException {
         ShardedRedisMqUtil redisUtil = ShardedRedisMqUtil.getInstance();
-        Collection<JedisShardInfo> jedisCollection = redisUtil.getAllShardInfo();
+        Collection<JedisShardInfo> jedisCollection = redisUtil.getAllJedisShardInfo();
         // 设置jedis连接池配置
         JedisPoolConfig poolConfig = new JedisPoolConfig();
         poolConfig.setMaxTotal(8);
@@ -54,24 +54,51 @@ public class RedisMqExtExample {
         poolConfig.setTestOnBorrow(true);
         //生成jedis的单一redis的线程池
         for (JedisShardInfo j : jedisCollection) {
+            System.out.println(j.toString());
             ShardedJedisPool shardedJedisPool = new ShardedJedisPool(poolConfig, Arrays.asList(j), Hashing.MURMUR_HASH);
+        }
+        Collection<Jedis> jCollection = redisUtil.getAllShards();
+        for (Jedis j : jCollection) {
+            System.out.println(j.toString());
+            JedisShardInfo jedisShardInfo=new JedisShardInfo(j.getClient().getHost());
+            jedisShardInfo.setConnectionTimeout(j.getClient().getConnectionTimeout());
+            jedisShardInfo.setSoTimeout(j.getClient().getSoTimeout());
+            System.out.println(j.toString());
+            ShardedJedisPool shardedJedisPool = new ShardedJedisPool(poolConfig, Arrays.asList(jedisShardInfo), Hashing.MURMUR_HASH);
         }
     }
 
     @Test
     public void brpopExtExample() throws InterruptedException {
         ShardedRedisMqUtil redisUtil = ShardedRedisMqUtil.getInstance();
-        Collection<JedisShardInfo> jedisCollection = redisUtil.getAllShardInfo();
+        Collection<JedisShardInfo> jedisCollection = redisUtil.getAllJedisShardInfo();
         // 设置jedis连接池配置
         JedisPoolConfig poolConfig = new JedisPoolConfig();
-        poolConfig.setMaxTotal(8);
-        poolConfig.setMaxIdle(8);
-        poolConfig.setMinIdle(3);
+        poolConfig.setMaxTotal(1);
+        poolConfig.setMaxIdle(1);
+        poolConfig.setMinIdle(1);
         poolConfig.setMaxWaitMillis(60000);
         poolConfig.setTestOnBorrow(true);
         ExecutorService executorService = Executors.newFixedThreadPool(jedisCollection.size());
         for (JedisShardInfo j : jedisCollection) {
             ShardedJedisPool shardedJedisPool = new ShardedJedisPool(poolConfig, Arrays.asList(j), Hashing.MURMUR_HASH);
+            JedisExecutorTask jedisExecutor = new JedisExecutorTask(shardedJedisPool, key);
+            executorService.execute(jedisExecutor);
+        }
+        new CountDownLatch(1).await();
+    }
+
+    /**
+     *
+     * @throws InterruptedException
+     */
+    @Test
+    public void brpopExtByShardedJedisPoolExample() throws InterruptedException {
+        ShardedRedisMqUtil redisUtil = ShardedRedisMqUtil.getInstance();
+        Collection<JedisShardInfo> jedisCollection = redisUtil.getAllJedisShardInfo();
+        ExecutorService executorService = Executors.newFixedThreadPool(jedisCollection.size());
+        for (JedisShardInfo j : jedisCollection) {
+            ShardedJedisPool shardedJedisPool =redisUtil.getOneShardedJedisPool(j);
             JedisExecutorTask jedisExecutor = new JedisExecutorTask(shardedJedisPool, key);
             executorService.execute(jedisExecutor);
         }
