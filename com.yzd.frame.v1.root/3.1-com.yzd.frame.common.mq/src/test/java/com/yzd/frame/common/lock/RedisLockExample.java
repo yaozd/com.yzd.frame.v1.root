@@ -17,6 +17,7 @@ public class RedisLockExample {
         ShardedRedisMqUtil redisUtil = ShardedRedisMqUtil.getInstance();
         String timestamp=String.valueOf(System.currentTimeMillis()) ;
         String key ="my:lock";
+        //超时时间必须大于业务逻辑执行的时间-锁才会有效果
         String isLock= redisUtil.set(key, timestamp, "nx", "ex", 10);
         if(ObjectUtils.equals(isLock,"OK")){
             //具体的业务逻辑
