@@ -9,9 +9,10 @@
 	<dubbo:application name="com.yzd.dubbo.service.consumer" logger="slf4j"/>
     <!--check="false":dubbo接口懒惰,惰性检查,懒加载,接口检查,服务检查.开启.启用,打开-->
     <!--timeout="10000":远程调用的超时时间为10秒-->
-    <dubbo:consumer check="false" timeout="10000" />
+    <dubbo:consumer check="false" timeout="10000" filter="mdcFilter" />
 	<!-- 使用multicast广播注册中心暴露发现服务地址 -->
-	<dubbo:registry protocol="zookeeper" address="192.168.1.222:2181" />
+	<!--<dubbo:registry protocol="zookeeper" address="192.168.1.222:2181" />-->
+	<dubbo:registry protocol="zookeeper" address="127.0.0.1:2181" />
 	<!-- 生成远程服务代理，可以和本地bean一样使用demoService -->
 
     <!--<dubbo:monitor protocol="registry"/>-->

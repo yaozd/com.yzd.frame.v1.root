@@ -10,12 +10,32 @@
     <modelVersion>4.0.0</modelVersion>
 
     <artifactId>com.yzd.logging</artifactId>
-
+    <properties>
+        <!--当前是一个接口定义的包为解决MAVEN打包成可运行的jar-没办法找到唯一的一个入口类问题-->
+        <!--设置了一个不存在的虚拟入口类-->
+        <start-class>com.yzd.dubbo.service.inf.ApplicationMainClass</start-class>
+    </properties>
     <dependencies>
         <dependency>
             <groupId>javax.servlet</groupId>
             <artifactId>servlet-api</artifactId>
             <version>2.5</version>
+        </dependency>
+        <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-api</artifactId>
+            <version>1.7.25</version>
+        </dependency>
+        <dependency>
+            <groupId>com.alibaba</groupId>
+            <artifactId>dubbo</artifactId>
+            <version>2.5.3</version>
+            <exclusions>
+                <exclusion>
+                    <groupId>org.springframework</groupId>
+                    <artifactId>spring</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
     </dependencies>
 </project>

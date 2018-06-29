@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <!DOCTYPE configuration>
 <configuration>
-    <conversionRule conversionWord="TraceIdConvert" converterClass="com.yzd.web.logbackExt.TraceIdConvert" />
+    <conversionRule conversionWord="TraceIdConvert" converterClass="com.yzd.logging.logbackExt.TraceIdConvert" />
     <springProfile name="dev">
         <!--scope="context"会将变量赋加日志中-->
         <!--<springProperty scope="context" name="filePath" defaultValue="target/log" source="log.filePath.value"/>-->
