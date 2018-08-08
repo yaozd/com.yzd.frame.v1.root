@@ -5,6 +5,7 @@ import com.alibaba.dubbo.rpc.*;
 import com.yzd.logging.consts.ParamEnum;
 import com.yzd.logging.util.MDCUtil;
 import com.yzd.logging.util.StringUtils;
+import com.yzd.logging.util.UUIDUtil;
 
 import java.util.UUID;
 
@@ -14,7 +15,7 @@ public class DubboLogFilter implements Filter {
         if (RpcContext.getContext().isConsumerSide()) {
             String traceId = MDCUtil.get(MDCUtil.Type.TRACE_ID);
             if (StringUtils.isBlank(traceId)) {
-                traceId = UUID.randomUUID().toString();
+                traceId = UUIDUtil.getUUID();;
             }
             RpcContext.getContext().setAttachment(ParamEnum.TRACE_ID,traceId);
         }

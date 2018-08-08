@@ -3,6 +3,7 @@ package com.yzd.logging.filter;
 import com.yzd.logging.consts.ParamEnum;
 import com.yzd.logging.util.MDCUtil;
 import com.yzd.logging.util.StringUtils;
+import com.yzd.logging.util.UUIDUtil;
 
 import javax.servlet.*;
 import javax.servlet.http.HttpServletRequest;
@@ -16,7 +17,7 @@ public class ServletLogFilter implements Filter{
         HttpServletRequest request = (HttpServletRequest) servletRequest;
         String traceId = request.getHeader(ParamEnum.TRACE_ID);
         if (StringUtils.isEmpty(traceId)) {
-            traceId = UUID.randomUUID().toString();
+            traceId = UUIDUtil.getUUID();;
         }
         MDCUtil.put(MDCUtil.Type.TRACE_ID, traceId);
         filterChain.doFilter(servletRequest,servletResponse);

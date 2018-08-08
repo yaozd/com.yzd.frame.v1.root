@@ -14,10 +14,9 @@
     <!-- <dubbo:registry address="multicast://10.57.41.19:1234" /> -->
 
     <!--<dubbo:monitor protocol="registry"/>-->
-
     <!-- 用dubbo协议在20880端口暴露服务 -->
     <dubbo:protocol name="dubbo" port="29014" />
-    <dubbo:provider filter="mdcFilter" />
+    <dubbo:provider filter="mdcFilter" retries="0" timeout="60000" />
     <!--dubbo -payload默认为8M-->
     <!--<dubbo:protocol name="dubbo" port="20880" payload="8388608"/>-->
     <!--为了测试上传文件刻意将payload调整为40M，但实践开发过程中这样调整很容易造成程序内存溢出-payload默认为8M-->
