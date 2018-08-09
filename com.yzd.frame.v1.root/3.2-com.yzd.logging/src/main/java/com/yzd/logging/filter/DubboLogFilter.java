@@ -7,8 +7,6 @@ import com.yzd.logging.util.MDCUtil;
 import com.yzd.logging.util.StringUtils;
 import com.yzd.logging.util.UUIDUtil;
 
-import java.util.UUID;
-
 public class DubboLogFilter implements Filter {
     @Override
     public Result invoke(Invoker<?> invoker, Invocation invocation) throws RpcException {
@@ -22,7 +20,7 @@ public class DubboLogFilter implements Filter {
         if (RpcContext.getContext().isProviderSide()) {
             String traceId = RpcContext.getContext().getAttachment(ParamEnum.TRACE_ID);
             if (StringUtils.isBlank(traceId)) {
-                traceId = UUID.randomUUID().toString();
+                traceId = UUIDUtil.getUUID();
             }
             MDCUtil.put(MDCUtil.Type.TRACE_ID,traceId);
         }
