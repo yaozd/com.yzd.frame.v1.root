@@ -20,7 +20,7 @@ public class UserControllerAPI {
 
     private static final Logger log = LoggerFactory.getLogger(UserControllerAPI.class);
 
-    @GetMapping
+    @GetMapping("/query")
     @ApiOperation(value = "条件查询（DONE）")
     //hidden = true 隐藏当前方法
     //@ApiOperation(value = "条件查询（DONE）",hidden = true)
