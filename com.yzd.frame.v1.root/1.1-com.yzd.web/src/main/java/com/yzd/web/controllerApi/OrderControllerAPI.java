@@ -29,7 +29,7 @@ public class OrderControllerAPI {
         return "getOrder:"+id;
     }
     @GetMapping("getPrice")
-    @ApiOperation(value = "查询订单价格（DONE）")
+    @ApiOperation(value = "模拟异常情况-查询订单价格（DONE）")
     public String getPrice(){
         mockThrow();
         return "1.1";

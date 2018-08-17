@@ -1,5 +1,6 @@
 package com.yzd.web.conf;
 
+import com.yzd.web.logging.LogTraceInterceptor;
 import com.yzd.web.logging.LogURLInterceptor;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
@@ -11,7 +12,9 @@ public class WebMvcConfigurer extends WebMvcConfigurerAdapter {
     public void addInterceptors(InterceptorRegistry registry) {
         // addPathPatterns 用于添加拦截规则, 这里假设拦截 /url 后面的全部链接
         // excludePathPatterns 用户排除拦截
-
+        //位置的前后代表拦拦截器的执行顺序
+        registry.addInterceptor(new LogTraceInterceptor())
+                .addPathPatterns("/**");
         // LogInterceptor apply to all URLs.
         registry.addInterceptor(new LogURLInterceptor())
                 .addPathPatterns("/api/**");

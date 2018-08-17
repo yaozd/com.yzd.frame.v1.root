@@ -11,6 +11,11 @@ public class FilterConfiguration {
 
     @Bean
     public FilterRegistrationBean filterDemo4Registration() {
+        // * 分布式日志跟踪拦截器LogTraceInterceptor
+        // * LogTraceInterceptor等于LogURLInterceptor+ServletLogFilter
+        // * 优点 出现异常时不再打印LogTraceInterceptor的堆栈信息，但如里使用ServletLogFilter则打印ServletLogFilter的堆栈信息
+        // * 如果是spring mvc框架建议使用LogTraceInterceptor
+        //=====================================================
         //springboot之多个filter的执行顺序以及配置
         //https://blog.csdn.net/east123321/article/details/80856389
         FilterRegistrationBean registration = new FilterRegistrationBean();

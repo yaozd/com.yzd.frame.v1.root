@@ -13,8 +13,14 @@ import java.io.IOException;
  *
  * 参考同：Java过滤器与SpringMVC拦截器之间的关系与区别
  * https://blog.csdn.net/chenleixing/article/details/44573495
- * 所以在spring框架中优先使用拦截器，但需要使用spring mvc,目前暂时使用过滤器ServletLogFilter
- *
+ * 所以在spring框架中优先使用拦截器，但需要使用spring mvc
+ * 如果是spring mvc框架建议使用LogTraceInterceptor
+ * 依赖的mvn
+ * <dependency>
+ *  <groupId>javax.servlet</groupId>
+ *  <artifactId>servlet-api</artifactId>
+ *  <version>2.5</version>
+ * </dependency>
  */
 public class ServletLogFilter implements Filter{
 
