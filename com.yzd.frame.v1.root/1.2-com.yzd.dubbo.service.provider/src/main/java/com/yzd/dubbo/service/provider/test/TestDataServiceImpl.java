@@ -24,4 +24,9 @@ public class TestDataServiceImpl implements ITestDataServiceInf {
         int id= tblTestDataDao.insert(record);
         return id;
     }
+
+    @Override
+    public String getValue() {
+        return "测试方法：TestDataServiceImpl.getValue";
+    }
 }

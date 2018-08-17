@@ -42,4 +42,8 @@ public class TestDataService {
         int id = testDataServiceInf.insert(record);
         System.out.println(id);
     }
+
+    public String getValue(){
+        return testDataServiceInf.getValue();
+    }
 }

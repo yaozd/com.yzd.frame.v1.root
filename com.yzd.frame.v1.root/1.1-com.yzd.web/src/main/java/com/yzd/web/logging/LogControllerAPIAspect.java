@@ -30,7 +30,8 @@ public class LogControllerAPIAspect {
     public Object Interceptor(ProceedingJoinPoint pjp) throws Throwable {
         //获得请求参数，目前缓存方法只接受一个请求参数
         Object[] param = pjp.getArgs();
-        if(hasParam(param)){logger.info("用户请求的URI参数:{}",FastJsonUtil.serialize(param));}
+        //用户请求的URI参数
+        if(hasParam(param)){logger.info("Request URI Parameters:{}",FastJsonUtil.serialize(param));}
         return pjp.proceed();
     }
     /**

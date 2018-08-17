@@ -19,4 +19,11 @@ public class TestDataService_UnitTest extends _BaseUnitTest {
         testDataService.insert();
         logger.info("insert end");
     }
+    @Test
+    public void getValue(){
+        logger.info("getValue begin");
+        testDataService.getValue();
+        logger.info("getValue end");
+
+    }
 }

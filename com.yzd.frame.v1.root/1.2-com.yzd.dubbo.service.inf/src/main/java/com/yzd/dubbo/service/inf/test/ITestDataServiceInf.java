@@ -7,4 +7,5 @@ import com.yzd.db.temp.entity.TblTestData;
  */
 public interface ITestDataServiceInf {
     int insert(TblTestData record);
+    String getValue();
 }

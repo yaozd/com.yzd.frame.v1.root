@@ -1,1 +1,2 @@
 mdcFilter=com.yzd.logging.filter.DubboLogFilter
+rpcRequestFilter=com.yzd.logging.filter.DubboRpcRequestLogFilter

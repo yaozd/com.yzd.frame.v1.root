@@ -13,7 +13,7 @@ public class LogURLInterceptor implements HandlerInterceptor {
     @Override
     public boolean preHandle(HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse, Object o) throws Exception {
         //记录每次请求的URL-打印用户请求的URI
-        logger.info("用户请求的URI: {};Method={};IP :{}", httpServletRequest.getRequestURI(),httpServletRequest.getMethod(),getIpAddr(httpServletRequest));
+        logger.info("Request URI: {};Method={};IP :{}", httpServletRequest.getRequestURI(),httpServletRequest.getMethod(),getIpAddr(httpServletRequest));
         return true;
     }
 

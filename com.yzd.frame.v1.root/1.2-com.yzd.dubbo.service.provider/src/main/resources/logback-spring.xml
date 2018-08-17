@@ -22,7 +22,7 @@
     <!--[#%d{yyyy-MM-dd HH:mm:ss.SSS}#]的作用：通过logstash在日志收集,方便Logstash进行日志分析-->
     <!--<property name="PATTERN" value="[TRACE_ID:%X{TRACE_ID}][#%d{yyyy-MM-dd HH:mm:ss.SSS}#]【%level】%logger#]%thread - %msg%n" />-->
     <!--<property name="PATTERN" value="[TRACE_ID:%TraceIdConvert][#%d{yyyy-MM-dd HH:mm:ss.SSS}#]【%level】%logger#]%thread - %msg%n" />-->
-    <property name="PATTERN" value="[ELK=][%TraceIdConvert]-[%d{yyyy-MM-dd HH:mm:ss.SSS}]-[%level]-[%logger]-[thread=%thread]- %msg|%n" />
+    <property name="PATTERN" value="[ELK=][%TraceIdConvert]-[%d{yyyy-MM-dd HH:mm:ss.SSS}]-[%level]-[%logger]-[thread=%thread]%n%msg|%n" />
     <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
         <encoder class="ch.qos.logback.classic.encoder.PatternLayoutEncoder">
             <pattern>${PATTERN}</pattern>
