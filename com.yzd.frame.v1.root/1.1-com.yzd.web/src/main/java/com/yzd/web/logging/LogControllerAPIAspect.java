@@ -1,9 +1,11 @@
 package com.yzd.web.logging;
 
 import com.yzd.web.util.fastjsonExt.FastJsonUtil;
+import org.aspectj.lang.JoinPoint;
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
+import org.aspectj.lang.annotation.Before;
 import org.aspectj.lang.annotation.Pointcut;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -26,13 +28,13 @@ public class LogControllerAPIAspect {
      * @param pjp
      * @return JsonResult（被拦截方法的执行结果，或需要登录的错误提示。）
      */
-    @Around("controllerMethodPointcut()")
-    public Object Interceptor(ProceedingJoinPoint pjp) throws Throwable {
+    //将@Around调整为@Before ,不同之处在于：操作异常时，不再打印LogControllerAPIAspect的堆栈异常信息
+    @Before("controllerMethodPointcut()")
+    public void doBefore(JoinPoint pjp){
         //获得请求参数，目前缓存方法只接受一个请求参数
         Object[] param = pjp.getArgs();
         //用户请求的URI参数
         if(hasParam(param)){logger.info("Request URI Parameters:{}",FastJsonUtil.serialize(param));}
-        return pjp.proceed();
     }
     /**
      * 当前方法是否有参数
