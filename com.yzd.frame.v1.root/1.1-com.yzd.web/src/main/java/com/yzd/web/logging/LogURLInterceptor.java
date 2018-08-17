@@ -13,7 +13,7 @@ public class LogURLInterceptor implements HandlerInterceptor {
     @Override
     public boolean preHandle(HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse, Object o) throws Exception {
         //记录每次请求的URL-打印用户请求的URI
-        logger.info("用户请求的URI: {};Method={}", httpServletRequest.getRequestURI(),httpServletRequest.getMethod());
+        logger.info("用户请求的URI: {};Method={};IP :{}", httpServletRequest.getRequestURI(),httpServletRequest.getMethod(),getIpAddr(httpServletRequest));
         return true;
     }
 
@@ -25,5 +25,20 @@ public class LogURLInterceptor implements HandlerInterceptor {
     @Override
     public void afterCompletion(HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse, Object o, Exception e) throws Exception {
 
+    }
+
+    /***
+     * 客户端的真实IP地址
+     * squid.conf 的配制文件　forwarded_for 项默认是为on，如果 forwarded_for 设成了 off 　则：
+     * X-Forwarded-For: unknown
+     * 参考：request.getRemoteAddr()怎么获取用户真实的IP地址
+     * https://blog.csdn.net/lijunlinlijunlin/article/details/43714443
+     * @param request
+     * @return
+     */
+    String getIpAddr(HttpServletRequest request) {
+         String ip = request.getHeader("x-forwarded-for");
+         if(ip == null || ip.length() == 0) { ip = request.getRemoteAddr(); }
+         return ip;
     }
 }
