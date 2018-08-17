@@ -9,6 +9,13 @@ import javax.servlet.*;
 import javax.servlet.http.HttpServletRequest;
 import java.io.IOException;
 
+/***
+ *
+ * 参考同：Java过滤器与SpringMVC拦截器之间的关系与区别
+ * https://blog.csdn.net/chenleixing/article/details/44573495
+ * 所以在spring框架中优先使用拦截器，但需要使用spring mvc,目前暂时使用过滤器ServletLogFilter
+ *
+ */
 public class ServletLogFilter implements Filter{
 
     @Override
