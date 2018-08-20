@@ -71,6 +71,8 @@ public class LogControllerAPIAspect {
             }
             paramTmp[i]=obj;
         }
+        //fastjson 过滤不需要的字段或者只要某些字段
+        //https://blog.csdn.net/stubbornness1219/article/details/52947013
         if(paramTmp.length>0){
             logger.info("Request URI Parameters:{}",FastJsonUtil.serialize(paramTmp));
         }
