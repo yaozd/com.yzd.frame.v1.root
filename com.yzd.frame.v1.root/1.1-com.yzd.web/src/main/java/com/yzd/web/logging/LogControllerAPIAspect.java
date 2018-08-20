@@ -9,6 +9,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 
+import javax.servlet.ServletRequest;
+import javax.servlet.ServletResponse;
+
 
 @Aspect
 @Component
@@ -32,7 +35,7 @@ public class LogControllerAPIAspect {
         //获得请求参数，目前缓存方法只接受一个请求参数
         Object[] param = pjp.getArgs();
         //用户请求的URI参数
-        if(hasParam(param)){logger.info("Request URI Parameters:{}",FastJsonUtil.serialize(param));}
+        logParam(param);
     }
     /**
      * 当前方法是否有参数
@@ -44,5 +47,32 @@ public class LogControllerAPIAspect {
             return false;
         }
         return true;
+    }
+    /**
+     * 打印请求参数，但ServletRequest与ServletResponse对象无法进行json格式化
+     * @param param
+     * @return
+     */
+    private void logParam(Object[] param){
+        if(param==null||param.length==0){
+            return;
+        }
+        int len=param.length;
+        Object[] paramTmp=new Object[param.length];
+        for (int i = 0; i <len ; i++) {
+            Object obj=param[i];
+            if(obj instanceof ServletRequest){
+                paramTmp[i]="ServletRequest";
+                continue;
+            }
+            if(obj instanceof ServletResponse){
+                paramTmp[i]="ServletResponse";
+                continue;
+            }
+            paramTmp[i]=obj;
+        }
+        if(paramTmp.length>0){
+            logger.info("Request URI Parameters:{}",FastJsonUtil.serialize(paramTmp));
+        }
     }
 }
