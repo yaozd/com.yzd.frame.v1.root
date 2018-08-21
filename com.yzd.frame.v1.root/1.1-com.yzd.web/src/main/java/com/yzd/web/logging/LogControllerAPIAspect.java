@@ -35,6 +35,8 @@ public class LogControllerAPIAspect {
     public void doBefore(JoinPoint pjp){
         //获得请求参数，目前缓存方法只接受一个请求参数
         Object[] param = pjp.getArgs();
+        //主要用于调试情况下使用
+        //debugPrintClassInfo(pjp);
         //用户请求的URI参数
         logParam(param);
     }
@@ -48,6 +50,16 @@ public class LogControllerAPIAspect {
             return false;
         }
         return true;
+    }
+    /***
+     * 主要用于调试时打印类的信息，暂时不记录
+     * @param pjp
+     */
+    private void debugPrintClassInfo(JoinPoint pjp) {
+        StringBuilder sb=new StringBuilder();
+        sb.append("目标方法名为:" + pjp.getSignature().getName());
+        sb.append("目标方法所属类的类名:" + pjp.getSignature().getDeclaringTypeName());
+        logger.info(sb.toString());
     }
     /**
      * 打印请求参数，但ServletRequest与ServletResponse对象无法进行json格式化
