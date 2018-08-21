@@ -7,6 +7,7 @@ import com.alibaba.fastjson.serializer.ValueFilter;
 import java.lang.reflect.Field;
 
 /**
+ * 此工具只用于分布式日志跟踪收集使用。其他方法不要引用此工具
  * 日志敏感信息脱敏工具
  * 通过fastJson对日志中的敏感信息(如：密码、身份证、电话、银行卡等)，进行日志字段脱敏处理
  * @author worstEzreal
