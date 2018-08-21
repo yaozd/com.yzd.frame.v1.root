@@ -7,7 +7,9 @@ import org.aspectj.lang.annotation.Before;
 import org.aspectj.lang.annotation.Pointcut;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.core.io.InputStreamSource;
 import org.springframework.stereotype.Component;
+import org.springframework.web.multipart.MultipartFile;
 
 import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
@@ -69,10 +71,21 @@ public class LogControllerAPIAspect {
                 paramTmp[i]="ServletResponse";
                 continue;
             }
+            //过滤文件类型参数
+            if(obj instanceof MultipartFile){
+                paramTmp[i]="MultipartFile";
+                continue;
+            }
+            if(obj instanceof MultipartFile[]){
+                paramTmp[i]="MultipartFile[]";
+                continue;
+            }
             paramTmp[i]=obj;
         }
         //fastjson 过滤不需要的字段或者只要某些字段
         //https://blog.csdn.net/stubbornness1219/article/details/52947013
+        //对于敏感信息可以通过 transient或者@JSONField(serialize=false) 过滤掉
+        //目前推荐使用transient关键词
         if(paramTmp.length>0){
             logger.info("Request URI Parameters:{}",FastJsonUtil.serialize(paramTmp));
         }
