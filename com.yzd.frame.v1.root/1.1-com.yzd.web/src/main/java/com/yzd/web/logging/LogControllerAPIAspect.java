@@ -1,13 +1,12 @@
 package com.yzd.web.logging;
 
-import com.yzd.web.util.fastjsonExt.FastJsonUtil;
+import com.yzd.logging.util.FastJsonLogUtil;
 import org.aspectj.lang.JoinPoint;
 import org.aspectj.lang.annotation.Aspect;
 import org.aspectj.lang.annotation.Before;
 import org.aspectj.lang.annotation.Pointcut;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.core.io.InputStreamSource;
 import org.springframework.stereotype.Component;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -85,9 +84,11 @@ public class LogControllerAPIAspect {
         //fastjson 过滤不需要的字段或者只要某些字段
         //https://blog.csdn.net/stubbornness1219/article/details/52947013
         //对于敏感信息可以通过 transient或者@JSONField(serialize=false) 过滤掉
-        //目前推荐使用transient关键词
+        //
+        //通过fastJson对日志中的敏感信息(如：密码、身份证、电话、银行卡等)，进行日志字段脱敏处理
+        //推荐使用注解的方式对日志字段进行脱敏，不推荐使用@JSONField(serialize=false)或transient
         if(paramTmp.length>0){
-            logger.info("Request URI Parameters:{}",FastJsonUtil.serialize(paramTmp));
+            logger.info("Request URI Parameters:{}",FastJsonLogUtil.toJsonString(paramTmp));
         }
     }
 }

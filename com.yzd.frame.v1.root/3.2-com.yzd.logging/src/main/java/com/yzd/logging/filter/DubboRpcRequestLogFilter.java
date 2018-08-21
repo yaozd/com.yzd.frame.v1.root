@@ -1,12 +1,9 @@
 package com.yzd.logging.filter;
 
 import com.alibaba.dubbo.rpc.*;
-import com.yzd.logging.util.FastJsonUtil;
+import com.yzd.logging.util.FastJsonLogUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.slf4j.MDC;
-
-import java.util.UUID;
 
 /***
  * 此过滤为可选方案-有请求可以加上
@@ -27,7 +24,7 @@ public class DubboRpcRequestLogFilter implements Filter {
         Object[] args = RpcContext.getContext().getArguments();
         //invoker.invoke(invocation)前记录dubbo的RPC请求信息
         //目前暂定不记录清求时间花费的时间
-        logger.info("DubboRpcRequestInfo:remote ip:{},hostname:{} ,class:{}, invoke method:{}, args:{}",remoteIp,hostName,clazz,method,FastJsonUtil.serialize(args));
+        logger.info("DubboRpcRequestInfo:remote ip:{},hostname:{} ,class:{}, invoke method:{}, args:{}",remoteIp,hostName,clazz,method,FastJsonLogUtil.toJsonString(args));
         return invoker.invoke(invocation);
 
     }

@@ -1,6 +1,8 @@
 package com.yzd.web.model;
 
 import com.alibaba.fastjson.annotation.JSONField;
+import com.yzd.logging.util.SensitiveLogInfo;
+import com.yzd.logging.util.SensitiveLogType;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 
@@ -15,9 +17,12 @@ public class User implements Serializable {
     @ApiModelProperty("用户名")
     private String username;
     @ApiModelProperty("密码")
+    //推荐使用注解的方式对日志字段进行脱敏，不推荐使用@JSONField(serialize=false)或transient
+    @SensitiveLogInfo(type = SensitiveLogType.PASSWORD)
+    private String password;
     //@JSONField(serialize=false)
     //private  String password;
-    private transient String password;
+    //private transient String password;
 
     // TODO  省略get set
 

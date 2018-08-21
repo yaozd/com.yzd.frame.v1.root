@@ -12,6 +12,7 @@ import org.springframework.context.annotation.ComponentScan;
 import java.util.UUID;
 
 /**
+ * http://localhost:8880/swagger-ui.html
  * Created by Administrator on 2017/2/24.
  */
 @SpringBootApplication
