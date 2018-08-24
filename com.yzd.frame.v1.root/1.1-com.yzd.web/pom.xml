@@ -46,6 +46,13 @@
         <artifactId>fastjson</artifactId>
         <version>1.2.39</version>
     </dependency>
+    <!--==================分割线========================-->
+    <!-- https://mvnrepository.com/artifact/cn.hutool/hutool-crypto -->
+    <dependency>
+        <groupId>cn.hutool</groupId>
+        <artifactId>hutool-crypto</artifactId>
+        <version>4.1.2</version>
+    </dependency>
 </dependencies>
 
 </project>

@@ -6,6 +6,7 @@ import com.yzd.logging.util.SensitiveLogType;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 
+import javax.validation.constraints.NotNull;
 import java.io.Serializable;
 
 @ApiModel
@@ -13,12 +14,15 @@ public class User implements Serializable {
 
     private static final long serialVersionUID = 8655851615465363473L;
 
+    @NotNull
     private Long id;
     @ApiModelProperty("用户名")
+    @NotNull
     private String username;
     @ApiModelProperty("密码")
     //推荐使用注解的方式对日志字段进行脱敏，不推荐使用@JSONField(serialize=false)或transient
     @SensitiveLogInfo(type = SensitiveLogType.PASSWORD)
+    @NotNull
     private String password;
     //@JSONField(serialize=false)
     //private  String password;

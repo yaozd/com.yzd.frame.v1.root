@@ -1,8 +1,11 @@
 package com.yzd.web.controllerApi;
 
+import com.yzd.web.aspectExt.ParamValid;
 import com.yzd.web.model.User;
 import com.yzd.web.util.swaggerExt.ApiDataType;
 import com.yzd.web.util.swaggerExt.ApiParamType;
+import com.yzd.web.util.validationExt.ValidationResult;
+import com.yzd.web.util.validationExt.ValidationUtil;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiImplicitParams;
@@ -10,6 +13,8 @@ import io.swagger.annotations.ApiOperation;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.web.bind.annotation.*;
+
+import javax.validation.Valid;
 
 @RestController
 @RequestMapping("/api/users")
@@ -52,7 +57,12 @@ public class UserControllerAPI {
 
     @PostMapping
     @ApiOperation(value = "添加用户（DONE）")
-    public User post(@RequestBody User user) {
+    public User post(@RequestBody @ParamValid User user) {
+        ValidationResult resultValidation = ValidationUtil.validateEntity(user);
+        if (resultValidation.isHasErrors()) {
+            String error=resultValidation.toString();
+            //return new JsonResultError(resultValidation.toString());
+        }
         log.info("如果是 POST PUT 这种带 @RequestBody 的可以不用写 @ApiImplicitParam");
         return user;
     }
