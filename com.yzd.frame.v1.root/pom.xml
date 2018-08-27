@@ -19,6 +19,7 @@
         <module>1.1-com.yzd.session</module>
         <module>3.1-com.yzd.frame.common.mq</module>
         <module>3.2-com.yzd.logging</module>
+        <module>3.3-com.yzd.service.monitor</module>
     </modules>
     <parent>
         <groupId>org.springframework.boot</groupId>
