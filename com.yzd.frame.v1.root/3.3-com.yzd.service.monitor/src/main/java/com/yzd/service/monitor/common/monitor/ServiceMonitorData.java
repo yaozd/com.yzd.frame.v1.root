@@ -23,6 +23,8 @@ public class ServiceMonitorData {
 
     private ServiceMonitorData() {
     }
+    //ContextClosedEvent,程序退出关闭
+    private boolean isShutdownEvent=false;
 
     final int maxSize = 10;
     //参考：BlockingQueue的使用
@@ -46,6 +48,10 @@ public class ServiceMonitorData {
             //取走BlockingQueue里排在首位的对象,若BlockingQueue为空,阻断进入等待状态直到Blocking有新的对象被加入为止
             return (AtomicLong)arrayBlockingQueue.take();
         } catch (InterruptedException e) {
+            //程序退出关闭，产生的中断不触发异常
+            if(isShutdownEvent){
+                return null;
+            }
             throw new IllegalStateException(e);
         }
     }
@@ -58,6 +64,10 @@ public class ServiceMonitorData {
             //poll(time):取走BlockingQueue里排在首位的对象,若不能立即取出,则可以等time参数规定的时间,取不到时返回null
            return (AtomicLong)arrayBlockingQueue.poll(timeout,unit);
         } catch (InterruptedException e) {
+            //程序退出关闭，产生的中断不触发异常
+            if(isShutdownEvent){
+                return null;
+            }
             throw new IllegalStateException(e);
         }
     }
@@ -65,4 +75,8 @@ public class ServiceMonitorData {
         return arrayBlockingQueue.size();
     }
 
+
+    public void setShutdownEvent(boolean shutdownEvent) {
+        isShutdownEvent = shutdownEvent;
+    }
 }

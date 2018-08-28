@@ -1,11 +1,15 @@
 package com.yzd.service.monitor.common.monitor;
 
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.context.ApplicationEvent;
 
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.Iterator;
+import java.util.List;
 import java.util.concurrent.ExecutionException;
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicLong;
 
 /***
@@ -49,7 +53,32 @@ public class ServiceMonitorUtil {
      */
     public static void sendData(){
         AtomicLong value=ServiceMonitorData.getInstance().take();
+        if(value==null){
+            //log.info("当前数据是NULL，不发送");
+            return;
+        }
         log.info("发送数据="+value.toString());
+    }
+
+    /***
+     * 程序退出时，发送所有监控数据
+     * 此方法用于程序退出监听
+     * @return
+     */
+    public static void sendAllData(){
+        Iterator<String> iterator = ServiceMonitorCache.getInstance().localCache.asMap().keySet().iterator();
+        while (iterator.hasNext()) {
+            String fullKey = iterator.next();
+            //不要使用keyAccessCount.invalidateAll清除所有，keyAccessCount.invalidateAll在运行20分钟后会自动停止
+            ServiceMonitorCache.getInstance().localCache.invalidate(fullKey);
+        }
+        List<AtomicLong> itemList=new ArrayList<>();
+        while (true){
+            AtomicLong item=ServiceMonitorData.getInstance().poll(2,TimeUnit.SECONDS);
+            if(item==null){break;}
+            itemList.add(item);
+        }
+        log.info("发送所有数据："+itemList.toString());
     }
 
     private static String getFullKey(String key) {
@@ -72,5 +101,12 @@ public class ServiceMonitorUtil {
             throw new IllegalArgumentException("fullKey=" + fullKey + ";数据格式不正确");
         }
         return arr[1];
+    }
+
+    /***
+     * 程序退出关闭
+     */
+    public static void shutdownEvent()  {
+        ServiceMonitorData.getInstance().setShutdownEvent(true);
     }
 }

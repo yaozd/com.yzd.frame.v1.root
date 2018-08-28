@@ -24,7 +24,8 @@ public class ScheduleConfig implements SchedulingConfigurer {
         taskRegistrar.setScheduler(taskExecutor());
     }
 
-    @Bean(destroyMethod="shutdown")
+    //@Bean(destroyMethod="shutdown")
+    @Bean
     public Executor taskExecutor() {
         //可以根据调度任务的个数来设置线程池的大小
         //return Executors.newScheduledThreadPool(30);
@@ -34,7 +35,8 @@ public class ScheduleConfig implements SchedulingConfigurer {
         scheduler.setThreadNamePrefix("TaskScheduler-");
         //设置调度任务线程池终止等待时间为12秒
         //scheduler的终止是在应用关闭【applicationEvent instanceof ContextClosedEvent】之后执行的。
-        scheduler.setAwaitTerminationSeconds(1);
+        //计划任务的中断等待时间设置
+        scheduler.setAwaitTerminationSeconds(3);
         scheduler.setWaitForTasksToCompleteOnShutdown(true);
         return scheduler;
     }
