@@ -8,6 +8,7 @@ import springfox.documentation.swagger2.annotations.EnableSwagger2;
 /**
  * Created by Administrator on 2017/2/24.
  * http://localhost:8890/
+ * http://localhost:8890/swagger-ui.html
  */
 @SpringBootApplication
 @EnableSwagger2

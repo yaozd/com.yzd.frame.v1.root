@@ -47,6 +47,12 @@
             <version>2.7.0</version>
         </dependency>
         <!-- swagger2 -->
+        <dependency>
+            <groupId>org.projectlombok</groupId>
+            <artifactId>lombok</artifactId>
+            <version>1.16.8</version>
+        </dependency>
+
     </dependencies>
 
 </project>

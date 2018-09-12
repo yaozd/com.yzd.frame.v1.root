@@ -30,7 +30,8 @@ public class WebMvcConfig extends WebMvcConfigurerAdapter {
     public void addInterceptors(InterceptorRegistry registry) {
         registry.addInterceptor(new ApiTokenInterceptor())
                 .addPathPatterns("/api/**")
-                .excludePathPatterns("/api/test/token/**");
+                .excludePathPatterns("/api/test/token/**")
+                .excludePathPatterns("/api/token/**");
     }
 
     /**
