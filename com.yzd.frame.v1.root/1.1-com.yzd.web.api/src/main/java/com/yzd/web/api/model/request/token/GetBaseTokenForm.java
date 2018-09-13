@@ -11,12 +11,9 @@ import javax.validation.constraints.Pattern;
  */
 @Data
 @NoArgsConstructor
-public class GetBaseTokenForm {
+public class GetBaseTokenForm extends BaseTokenForm{
     @NotNull
     private String appId;
     @NotNull
     private String appTypeId;
-    @NotNull
-    @Pattern(regexp = "[\\d]{13}")
-    private String timestamp;
 }

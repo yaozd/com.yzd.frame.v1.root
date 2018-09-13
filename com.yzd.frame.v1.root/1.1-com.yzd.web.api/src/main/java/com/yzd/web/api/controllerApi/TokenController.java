@@ -1,8 +1,13 @@
 package com.yzd.web.api.controllerApi;
 
+import com.yzd.session.session.CurrentUser;
+import com.yzd.web.api.common.exceptionExt.DataValidException;
+import com.yzd.web.api.common.exceptionExt.TokenValidException;
+import com.yzd.web.api.model.request.token.BaseTokenForm;
 import com.yzd.web.api.model.request.token.GetBaseTokenForm;
 import com.yzd.web.api.model.request.token.RefreshFrom;
 import com.yzd.web.api.utils.jwtExt.JWTUtil3;
+import com.yzd.web.api.utils.jwtExt.RefreshResultJWT;
 import com.yzd.web.api.utils.signExt.SignUtil;
 import org.apache.commons.lang.BooleanUtils;
 import org.apache.commons.lang.StringUtils;
@@ -22,12 +27,14 @@ public class TokenController {
     public String getBaseToken(GetBaseTokenForm form,String sign){
         filterForGetBaseToken(form, sign);
         //创建 token,当user为null时是未登录的访问token
-        String token= JWTUtil3.createToken(null);
+        String token= JWTUtil3.createToken(CurrentUser.createEmptyUser());
         return token;
     }
-    @RequestMapping(value = "refresh")
-    public String refresh(RefreshFrom from,String sign){
-        return null;
+    @PostMapping(value = "refresh")
+    public RefreshResultJWT refresh(RefreshFrom form,String sign){
+        filterForGetBaseToken(form, sign);
+        RefreshResultJWT refreshResultJWT=JWTUtil3.refreshToken(form.getRefreshToken(),CurrentUser.class);
+        return refreshResultJWT;
     }
 
     /***
@@ -35,18 +42,18 @@ public class TokenController {
      * @param form
      * @param sign
      */
-    private void filterForGetBaseToken(GetBaseTokenForm form, String sign) {
+    private void filterForGetBaseToken(BaseTokenForm form, String sign) {
         if(StringUtils.isBlank(sign)){
-            throw new RuntimeException("//签名不能为空");
+            throw new TokenValidException("//签名不能为空");
         }
         Long tokenTimestamp= NumberUtils.createLong(form.getTimestamp());
         Long nowTimestamp=System.currentTimeMillis();
         Long diffVal=Math.abs(nowTimestamp-tokenTimestamp);
         if(diffVal>min5){
-            throw new RuntimeException("//只接受5分钟内的时间差");
+            throw new TokenValidException("//只接受5分钟内的时间差");
         }
         if(BooleanUtils.isNotTrue(SignUtil.check(form, sign))){
-            throw new RuntimeException("//签名不正确");
+            throw new TokenValidException("//签名不正确");
         }
     }
 }

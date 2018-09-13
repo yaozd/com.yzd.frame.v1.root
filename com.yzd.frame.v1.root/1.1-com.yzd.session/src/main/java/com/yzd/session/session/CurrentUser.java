@@ -1,5 +1,7 @@
 package com.yzd.session.session;
 
+import java.util.UUID;
+
 /***
  *
  *
@@ -8,41 +10,56 @@ package com.yzd.session.session;
  */
 
 public class CurrentUser {
-
-    public CurrentUser(long id, String name, Integer userTypeId) {
-        this.Id = id;
-        this.Name = name;
-        this.UserTypeId = userTypeId;
+    private CurrentUser(){}
+    private CurrentUser(long id, String name, Integer userTypeId) {
+        this.id = id;
+        this.name = name;
+        this.userTypeId = userTypeId;
     }
+    //登录用户主要用于登录情况下，访问token生成
+    public static CurrentUser createLoginUser(long id, String name, Integer userTypeId){
+        return new CurrentUser(id,name,userTypeId);
+    }
+    //空用户主要用于无登录情况下，访问token生成
+    public static CurrentUser createEmptyUser(){
+        return new CurrentUser();
+    }
+    private long id;
+    private String name;
+    private Integer userTypeId;
+    /***
+     * accessUUID(访问请求UUID)
+     * 作用一：实现防止重复请求，重复表单提交；
+     * 作用二：实现控制器访问次数限制
+     */
+    private String accessUUID=UUID.randomUUID().toString().replace("-","").toLowerCase();
 
-    private long Id;
-    private String Name;
-    private Integer UserTypeId;
 
     public long getId() {
-        return Id;
+        return id;
     }
 
-    public CurrentUser setId(long id) {
-        Id = id;
-        return this;
+    public void setId(long id) {
+        this.id = id;
     }
 
     public String getName() {
-        return Name;
+        return name;
     }
 
-    public CurrentUser setName(String name) {
-        Name = name;
-        return this;
+    public void setName(String name) {
+        this.name = name;
     }
 
     public Integer getUserTypeId() {
-        return UserTypeId;
+        return userTypeId;
     }
 
-    public CurrentUser setUserTypeId(Integer userTypeId) {
-        UserTypeId = userTypeId;
-        return this;
+    public void setUserTypeId(Integer userTypeId) {
+        this.userTypeId = userTypeId;
+    }
+
+    public String getAccessUUID() {
+        return accessUUID;
     }
 }

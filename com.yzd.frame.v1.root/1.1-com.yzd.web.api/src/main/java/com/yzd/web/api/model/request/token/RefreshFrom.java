@@ -1,6 +1,7 @@
 package com.yzd.web.api.model.request.token;
 
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import org.hibernate.validator.constraints.NotBlank;
 
@@ -12,14 +13,12 @@ import javax.validation.constraints.Pattern;
  */
 @Data
 @NoArgsConstructor
-public class RefreshFrom {
+@EqualsAndHashCode(callSuper = false)
+public class RefreshFrom extends BaseTokenForm{
     @NotBlank
     private String appId;
     @NotBlank
     private String appTypeId;
     @NotBlank
     private String refreshToken;
-    @NotNull
-    @Pattern(regexp = "[\\d]{13}")
-    private String timestamp;
 }

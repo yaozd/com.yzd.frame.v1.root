@@ -5,6 +5,7 @@ import com.yzd.session.session.CurrentUserContextHolder;
 import com.yzd.web.api.utils.fastjsonExt.FastJsonUtil;
 import com.yzd.web.api.utils.jwtExt.JWTUtil3;
 import com.yzd.web.api.utils.jwtExt.VerifyResultJWT;
+import org.apache.commons.lang.BooleanUtils;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.web.servlet.HandlerInterceptor;
 import org.springframework.web.servlet.ModelAndView;
@@ -13,7 +14,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 /***
- *
+ * 验证api签名，拦截错误签名的请求
  *
  * @author yzd
  * @date 2018/9/12 16:42.
@@ -38,7 +39,7 @@ public class ApiTokenInterceptor implements HandlerInterceptor {
         CurrentUserContextHolder.remove();
         //验证是否通过
         VerifyResultJWT verifyResultJWT = JWTUtil3.verifyToken(accessToken);
-        if(!verifyResultJWT.getIsOk()){
+        if(BooleanUtils.isNotTrue(verifyResultJWT.getIsOk())){
             httpServletResponse.setStatus(401);
             httpServletResponse.setContentType("application/json");
             httpServletResponse.setCharacterEncoding("UTF-8");

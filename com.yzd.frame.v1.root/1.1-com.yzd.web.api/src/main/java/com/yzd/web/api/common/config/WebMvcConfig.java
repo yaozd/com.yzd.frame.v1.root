@@ -1,5 +1,6 @@
 package com.yzd.web.api.common.config;
 
+import com.yzd.web.api.common.interceptor.ApiLoginInterceptor;
 import com.yzd.web.api.common.interceptor.ApiTokenInterceptor;
 import org.springframework.boot.context.embedded.EmbeddedServletContainerFactory;
 import org.springframework.boot.context.embedded.tomcat.TomcatEmbeddedServletContainerFactory;
@@ -32,6 +33,9 @@ public class WebMvcConfig extends WebMvcConfigurerAdapter {
                 .addPathPatterns("/api/**")
                 .excludePathPatterns("/api/test/token/**")
                 .excludePathPatterns("/api/token/**");
+        registry.addInterceptor(new ApiLoginInterceptor())
+                .addPathPatterns("/api/account/**")
+                .excludePathPatterns("/api/account/doLogin");
     }
 
     /**

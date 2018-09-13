@@ -20,6 +20,7 @@ public class SignUtil {
             sb.append(item);
         }
         String objSign= MD5Util.encode(sb.toString(), "utf-8");
+        System.out.println(objSign);
         return sign.equals(objSign);
     }
     public static <T> Map<String,Object> beanToMap(T obj){
