@@ -9,6 +9,7 @@ import com.auth0.jwt.interfaces.Claim;
 import com.auth0.jwt.interfaces.DecodedJWT;
 import com.yzd.web.api.utils.fastjsonExt.FastJsonUtil;
 import org.apache.commons.lang.StringUtils;
+import org.joda.time.DateTime;
 
 import java.io.UnsupportedEncodingException;
 import java.util.Date;
@@ -26,8 +27,8 @@ public class JWTUtil3 {
     private static final String ISSUER = "yzd";
     //用户信息JSON格式
     private static final String USER_JSON = "userJson";
-    // 过期时间5分钟
-    private static final long EXPIRE_TIME = 5*60*1000;
+    // 过期时间30天
+    private static final int EXPIRE_TIME = 30;
     //可以多次使用的校验实例
     private static final JWTVerifier jwtVerifier=getJWTVerifier();
 
@@ -44,9 +45,9 @@ public class JWTUtil3 {
      * @return
      */
     public static <T> String createToken(T user){
-        Long nowLong=System.currentTimeMillis();
-        Date issuedDate=new Date(nowLong);
-        Date expireDate=new Date(nowLong+EXPIRE_TIME);
+        DateTime dtNow = new DateTime(System.currentTimeMillis());
+        Date issuedDate=dtNow.toDate();
+        Date expireDate=dtNow.plusDays(EXPIRE_TIME).toDate();
         JWTCreator.Builder builder = JWT.create()
                 //签发者
                 .withIssuer(ISSUER)

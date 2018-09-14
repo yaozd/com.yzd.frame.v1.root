@@ -53,6 +53,24 @@
         <artifactId>hutool-crypto</artifactId>
         <version>4.1.2</version>
     </dependency>
+    <dependency>
+        <groupId>org.projectlombok</groupId>
+        <artifactId>lombok</artifactId>
+        <version>1.16.8</version>
+    </dependency>
+    <!-- https://mvnrepository.com/artifact/com.netflix.feign/feign-gson -->
+    <dependency>
+        <groupId>com.netflix.feign</groupId>
+        <artifactId>feign-core</artifactId>
+        <version>8.18.0</version>
+    </dependency>
+    <!-- https://mvnrepository.com/artifact/com.netflix.feign/feign-gson -->
+    <dependency>
+        <groupId>com.netflix.feign</groupId>
+        <artifactId>feign-gson</artifactId>
+        <version>8.18.0</version>
+    </dependency>
+    <!-- https://mvnrepository.com/artifact/com.netflix.feign/feign-gson -->
 </dependencies>
 
 </project>

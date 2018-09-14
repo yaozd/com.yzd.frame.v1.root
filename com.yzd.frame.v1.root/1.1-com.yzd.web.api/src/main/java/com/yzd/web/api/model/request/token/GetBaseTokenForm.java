@@ -12,8 +12,14 @@ import javax.validation.constraints.Pattern;
 @Data
 @NoArgsConstructor
 public class GetBaseTokenForm extends BaseTokenForm{
+    /***
+     * AppId最好是唯一的值UUID或者是设备号
+     */
     @NotNull
     private String appId;
+    /***
+     * AppTypeId类型=web(1),android(2),ios(3)
+     */
     @NotNull
     private String appTypeId;
 }

@@ -13,8 +13,12 @@ import org.apache.commons.lang.BooleanUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.math.NumberUtils;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+
+import java.util.Calendar;
+import java.util.Date;
 
 /**
  * Created by zd.yao on 2018/9/12.
@@ -24,7 +28,7 @@ import org.springframework.web.bind.annotation.RestController;
 public class TokenController {
     private static final Long min5=5*60*1000L;
     @PostMapping("getBaseToken")
-    public String getBaseToken(GetBaseTokenForm form,String sign){
+    public String getBaseToken(@RequestBody GetBaseTokenForm form, String sign){
         filterForGetBaseToken(form, sign);
         //创建 token,当user为null时是未登录的访问token
         String token= JWTUtil3.createToken(CurrentUser.createEmptyUser());
