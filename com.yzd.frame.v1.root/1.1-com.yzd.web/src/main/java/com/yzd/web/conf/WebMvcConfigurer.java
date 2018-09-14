@@ -11,8 +11,7 @@ public class WebMvcConfigurer extends WebMvcConfigurerAdapter {
     @Override
     public void addInterceptors(InterceptorRegistry registry) {
         //为每个请求增加非登录下访问的Token
-        registry.addInterceptor(new TokenCheckInterceptor())
-                .addPathPatterns("/**");
+        //registry.addInterceptor(new TokenCheckInterceptor()).addPathPatterns("/**");
         //
         // addPathPatterns 用于添加拦截规则, 这里假设拦截 /url 后面的全部链接
         // excludePathPatterns 用户排除拦截

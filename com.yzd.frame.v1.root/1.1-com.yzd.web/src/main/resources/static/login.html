@@ -3,8 +3,10 @@
 <head>
     <meta charset="UTF-8">
     <title>LOGIN-TOKEN-JWT</title>
-    <script type="text/javascript">
-    </script>
+    <!--//必须放在最开始的位置,可以阻塞JS的执行。通过次来增加非登录下访问的Token-->
+    <script type="text/javascript" src="/api/account/getXX"></script>
+    <!--//link没有任何作用，不会阻塞js-->
+    <link rel="dns-prefetch" href="/api/account/getXX" />
 </head>
 <body>
 <form id="form1" action="http://www.apple.com">
@@ -32,7 +34,7 @@
         oDate.setDate(oDate.getDate()+days);   //days为保存时间长度
         document.cookie=name+'='+value+';expires='+oDate;
     }
-    setCookie('password','12345','14');     //保存密码,14天后过期
+    //setCookie('password','12345','14');     //保存密码,14天后过期
     function getCookie(name){
         var arr=document.cookie.split(';');
         for(var i=0;i<arr.length;i++){
